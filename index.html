@@ -3,69 +3,204 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Public Transport Optimizer</title>
-    <link rel="stylesheet" href="css/main.css" />
-    <link rel="stylesheet" href="css/dark-mode.css" />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.css"
-    />
+    <title>AI-Based Public Transport Dashboard - Delhi</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background-color: #f4f4f4;
+        text-align: center;
+      }
+      .container {
+        max-width: 1100px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+      .dashboard {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      .card {
+        background: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+      }
+      .card:hover {
+        transform: scale(1.05);
+      }
+      canvas {
+        max-width: 100%;
+        height: 300px;
+      }
+      h1 {
+        background: #007bff;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+      }
+    </style>
   </head>
   <body>
-    <header>
-      <nav>
-        <div class="logo">Transport Optimizer</div>
-        <div class="nav-links">
-          <a href="#route-suggestions">Route Suggestions</a>
-          <a href="#live-tracking">Live Tracking</a>
-          <a href="#insights">Insights</a>
+    <div class="container">
+      <h1>AI-Based Public Transportation Dashboard - Delhi</h1>
+      <div class="dashboard">
+        <div class="card">
+          <h3>Peak Hours Analysis</h3>
+          <canvas id="peakHoursChart"></canvas>
         </div>
-        <div class="mode-toggle">
-          <input type="checkbox" id="dark-mode-toggle" />
-          <label for="dark-mode-toggle">Dark Mode</label>
+        <div class="card">
+          <h3>Station Crowd Density</h3>
+          <canvas id="crowdDensityChart"></canvas>
         </div>
-      </nav>
-    </header>
-
-    <main>
-      <section id="route-suggestions">
-        <h1>Route Suggestions</h1>
-        <div class="search-container">
-          <input type="text" id="start-point" placeholder="Starting Point" />
-          <input type="text" id="destination" placeholder="Destination" />
-          <button id="find-routes">Find Routes</button>
+        <div class="card">
+          <h3>Bus Delays and Traffic Impact</h3>
+          <canvas id="busDelaysChart"></canvas>
         </div>
-        <div id="map"></div>
-        <div id="route-alternatives"></div>
-      </section>
-
-      <section id="live-tracking">
-        <h1>Live Bus/Metro Tracking</h1>
-        <select id="transport-line">
-          <option>Select Line</option>
-          <!-- Dynamically populated -->
-        </select>
-        <div id="tracking-info"></div>
-      </section>
-
-      <section id="insights">
-        <h1>Crowd & Traffic Insights</h1>
-        <div class="charts-container">
-          <canvas id="peak-hours-chart"></canvas>
-          <canvas id="crowd-density-chart"></canvas>
+        <div class="card">
+          <h3>Metro Utilization Rate</h3>
+          <canvas id="metroUsageChart"></canvas>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
 
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/route-suggestions.js"></script>
-    <script src="js/live-tracking.js"></script>
-    <script src="js/insights-dashboard.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        function getRandomData(base, range) {
+          return base.map(
+            (value) => value + Math.floor(Math.random() * range - range / 2)
+          );
+        }
+
+        const peakHoursChart = new Chart(
+          document.getElementById("peakHoursChart"),
+          {
+            type: "line",
+            data: {
+              labels: [
+                "6AM",
+                "8AM",
+                "10AM",
+                "12PM",
+                "2PM",
+                "4PM",
+                "6PM",
+                "8PM",
+              ],
+              datasets: [
+                {
+                  label: "Passenger Volume",
+                  data: [800, 1600, 1200, 1800, 900, 1400, 1700, 1100],
+                  borderColor: "rgba(54, 162, 235, 0.8)",
+                  fill: false,
+                },
+              ],
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } },
+          }
+        );
+
+        const crowdDensityChart = new Chart(
+          document.getElementById("crowdDensityChart"),
+          {
+            type: "line",
+            data: {
+              labels: [
+                "Connaught Place",
+                "Karol Bagh",
+                "Rajiv Chowk",
+                "Saket",
+                "Dwarka",
+              ],
+              datasets: [
+                {
+                  label: "Crowd Density (%)",
+                  data: [80, 75, 90, 65, 85],
+                  borderColor: "rgba(255, 99, 132, 0.8)",
+                  fill: false,
+                },
+              ],
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } },
+          }
+        );
+
+        const busDelaysChart = new Chart(
+          document.getElementById("busDelaysChart"),
+          {
+            type: "bar",
+            data: {
+              labels: ["Route 1", "Route 2", "Route 3", "Route 4", "Route 5"],
+              datasets: [
+                {
+                  label: "Average Delay (Minutes)",
+                  data: [15, 10, 20, 5, 12],
+                  backgroundColor: "rgba(255, 206, 86, 0.8)",
+                },
+              ],
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } },
+          }
+        );
+
+        const metroUsageChart = new Chart(
+          document.getElementById("metroUsageChart"),
+          {
+            type: "doughnut",
+            data: {
+              labels: [
+                "Blue Line",
+                "Yellow Line",
+                "Red Line",
+                "Green Line",
+                "Violet Line",
+              ],
+              datasets: [
+                {
+                  label: "Usage %",
+                  data: [30, 25, 15, 10, 20],
+                  backgroundColor: [
+                    "#007BFF",
+                    "#FFC107",
+                    "#DC3545",
+                    "#28A745",
+                    "#6610F2",
+                  ],
+                },
+              ],
+            },
+            options: { responsive: true },
+          }
+        );
+
+        function updateCharts() {
+          peakHoursChart.data.datasets[0].data = getRandomData(
+            [800, 1600, 1200, 1800, 900, 1400, 1700, 1100],
+            200
+          );
+          peakHoursChart.update();
+
+          crowdDensityChart.data.datasets[0].data = getRandomData(
+            [80, 75, 90, 65, 85],
+            10
+          );
+          crowdDensityChart.update();
+
+          busDelaysChart.data.datasets[0].data = getRandomData(
+            [15, 10, 20, 5, 12],
+            5
+          );
+          busDelaysChart.update();
+        }
+
+        setInterval(updateCharts, 3000);
+      });
+    </script>
   </body>
 </html>
